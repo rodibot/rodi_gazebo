@@ -7,6 +7,6 @@ link_directories(${GAZEBO_LIBRARY_DIRS})
 list(APPEND CMAKE_CXX_FLAGS "${GAZEBO_CXX_FLAGS}")
 
 add_library(model_rodi SHARED model_rodi.cc)
-target_link_libraries(model_rodi ${GAZEBO_LIBRARIES})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS} -lmicrohttpd")
+target_link_libraries(model_rodi ${GAZEBO_LIBRARIES} microhttpd)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
