@@ -14,12 +14,12 @@
 
 using namespace gazebo;
 
-enum RodiCommand { SCAN = 2, MOVE =3 };
+enum RodiCommand { SEE = 5, MOVE = 3 };
 
 class RodiWeb {
 private:
-	/* Only Scan (2) and Move (3) commands are supported */
-	std::string urlRegex = "^/(2|3(/-?([0-9][0-9]?|100)){2})/?$";
+	/* Only See (5) and Move (3) commands are supported */
+	std::string urlRegex = "^/(5|3(/-?([0-9][0-9]?|100)){2})/?$";
 	struct MHD_Daemon* webServer;
 	bool urlMatches(const char *url);
 	static int requestCallback(void *cls, struct MHD_Connection *connection,
@@ -31,7 +31,7 @@ private:
 public:
 	RodiWeb(int port);
 	~RodiWeb(void);
-	virtual std::string processScan(void) = 0;
+	virtual std::string processSee(void) = 0;
 	virtual void processMove(int left, int right) = 0;
 };
 
@@ -82,8 +82,8 @@ int RodiWeb::requestCallback(void *cls, struct MHD_Connection *connection,
 	command = server->getCommand(url);
 
 	switch (command) {
-	case SCAN:
-		res = server->processScan();
+	case SEE:
+		res = server->processSee();
 		break;
 	case MOVE:
 		server->getMoveParams(url, &left, &right);
@@ -125,12 +125,12 @@ private:
 	physics::JointPtr leftWheel;
 	physics::JointPtr rightWheel;
 public:
-	virtual std::string processScan(void);
+	virtual std::string processSee(void);
 	virtual void processMove(int left, int right);
 	void setModel(physics::ModelPtr model);
 };
 
-std::string RodiWebGazebo::processScan(void) {
+std::string RodiWebGazebo::processSee(void) {
 	/* TODO: add ultrasound support */
 	return "20";
 }
