@@ -4,6 +4,8 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
 #include <gazebo/common/common.hh>
+#include <gazebo/sensors/SensorManager.hh>
+#include <gazebo/sensors/SonarSensor.hh>
 #include <iostream>
 #include <string>
 #include <microhttpd.h>
@@ -121,9 +123,9 @@ class RodiWebGazebo : public RodiWeb {
 	using RodiWeb::RodiWeb;
 private:
 	physics::ModelPtr model;
-
 	physics::JointPtr leftWheel;
 	physics::JointPtr rightWheel;
+	sensors::SonarSensorPtr sonar;
 public:
 	virtual std::string processSee(void);
 	virtual void processMove(int left, int right);
@@ -131,8 +133,14 @@ public:
 };
 
 std::string RodiWebGazebo::processSee(void) {
-	/* TODO: add ultrasound support */
-	return "20";
+	std::ostringstream stream;
+
+#if GAZEBO_MAJOR_VERSION >= 7
+	stream << (int)(sonar->Range() * 100);
+#else
+	stream << (int)(sonar->GetRange() * 100);
+#endif
+	return stream.str();
 }
 
 void RodiWebGazebo::processMove(int left, int right)
@@ -143,11 +151,20 @@ void RodiWebGazebo::processMove(int left, int right)
 
 void RodiWebGazebo::setModel(physics::ModelPtr model)
 {
+	sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+
 	model = model;
 
 	leftWheel = model->GetJoint("left_wheel_servo");
 	rightWheel = model->GetJoint("right_wheel_servo");
 
+#if GAZEBO_MAJOR_VERSION >= 7
+	sonar = std::dynamic_pointer_cast<sensors::SonarSensor>(
+		mgr->GetSensor("sonar"));
+#else
+	sonar = boost::dynamic_pointer_cast<sensors::SonarSensor>(
+		mgr->GetSensor("sonar"));
+#endif
 }
 
 class ModelRodi : public ModelPlugin
