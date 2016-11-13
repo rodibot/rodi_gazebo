@@ -37,6 +37,19 @@
           </mesh>
         </geometry>
       </visual>
+
+      <sensor name="sonar" type="sonar">
+        <pose>0.04 0 0 0 -1.7 0</pose>
+        <sonar>
+          <min>0.2</min>
+          <max>1.0</max>
+          <!-- FIXME: this is an estimated value -->
+          <radius>0.5</radius>
+        </sonar>
+        <always_on>1</always_on>
+        <update_rate>30</update_rate>
+        <visualize>true</visualize>
+      </sensor>
     </link>
 
     <joint type="fixed" name="ball_caster_joint">
