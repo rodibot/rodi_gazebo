@@ -93,7 +93,7 @@ int RodiWeb::requestCallback(void *cls, struct MHD_Connection *connection,
 
 	response = MHD_create_response_from_buffer(strlen(res.c_str()),
 						   (void *)res.c_str(),
-						   MHD_RESPMEM_PERSISTENT);
+						   MHD_RESPMEM_MUST_COPY);
 
 	ret = MHD_queue_response(connection, MHD_HTTP_OK, response);
 	MHD_destroy_response(response);
