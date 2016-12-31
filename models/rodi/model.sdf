@@ -4,20 +4,6 @@
     <static>false</static>
     <link name='base_link'>
       <pose>0 0 0 0 0 0</pose>
-      <!--TODO: Define correct inertial values for RoDI
-      <inertial>
-        <pose>0 0 0 0 0 0</pose>
-        <mass>1.47</mass>
-        <inertia>
-          <ixx>0.011</ixx>
-          <ixy>0</ixy>
-          <ixz>0</ixz>
-          <iyy>0.015</iyy>
-          <iyz>0</iyz>
-          <izz>0.021</izz>
-        </inertia>
-      </inertial>
-        -->
 
       <collision name='base_link_collision'>
         <pose frame=''>0 0 0.0045 0 0 0</pose>
