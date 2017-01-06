@@ -127,7 +127,7 @@ private:
 	physics::JointPtr rightWheel;
 	sensors::SonarSensorPtr sonar;
 	event::ConnectionPtr updateConnection;
-	int left, right;
+	double left, right;
 public:
 	virtual std::string processSee(void);
 	virtual void processMove(int left, int right);
@@ -149,8 +149,9 @@ std::string RodiWebGazebo::processSee(void) {
 
 void RodiWebGazebo::processMove(int left, int right)
 {
-	this->left = left / 50;
-	this->right = right / 50;
+	/* The values are porcentages of the servos maximum operating angle */
+	this->left = 3.14 * left / 100;
+	this->right =3.14 * right / 100;
 	this->setWheelsVelocity(this->left, this->right);
 }
 
