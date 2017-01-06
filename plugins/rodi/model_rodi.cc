@@ -126,10 +126,14 @@ private:
 	physics::JointPtr leftWheel;
 	physics::JointPtr rightWheel;
 	sensors::SonarSensorPtr sonar;
+	event::ConnectionPtr updateConnection;
+	int left, right;
 public:
 	virtual std::string processSee(void);
 	virtual void processMove(int left, int right);
+	void setWheelsVelocity(int left, int right);
 	void setModel(physics::ModelPtr model);
+	void OnUpdate(const common::UpdateInfo &info);
 };
 
 std::string RodiWebGazebo::processSee(void) {
@@ -145,8 +149,15 @@ std::string RodiWebGazebo::processSee(void) {
 
 void RodiWebGazebo::processMove(int left, int right)
 {
-	this->leftWheel->SetVelocity(0, left / 50);
-	this->rightWheel->SetVelocity(0, right / 50);
+	this->left = left / 50;
+	this->right = right / 50;
+	this->setWheelsVelocity(this->left, this->right);
+}
+
+void RodiWebGazebo::setWheelsVelocity(int left, int right)
+{
+	this->leftWheel->SetVelocity(0, left);
+	this->rightWheel->SetVelocity(0, right);
 }
 
 void RodiWebGazebo::setModel(physics::ModelPtr model)
@@ -165,6 +176,14 @@ void RodiWebGazebo::setModel(physics::ModelPtr model)
 	sonar = boost::dynamic_pointer_cast<sensors::SonarSensor>(
 		mgr->GetSensor("sonar"));
 #endif
+	this->updateConnection = event::Events::ConnectWorldUpdateBegin(
+		boost::bind(&RodiWebGazebo::OnUpdate, this, _1));
+}
+
+void RodiWebGazebo::OnUpdate(const common::UpdateInfo &info)
+{
+	if (this->left && this->right)
+		this->setWheelsVelocity(this->left, this->right);
 }
 
 class ModelRodi : public ModelPlugin
