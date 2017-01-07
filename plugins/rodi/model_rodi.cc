@@ -110,7 +110,7 @@ RodiWeb::RodiWeb(int port)
 				     (unsigned int)120, MHD_OPTION_END);
 
 	if (!webServer)
-		throw;
+		gzthrow("The RoDI plugin webserver couldn't be created");
 }
 
 RodiWeb::~RodiWeb(void)
