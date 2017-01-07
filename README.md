@@ -2,20 +2,24 @@ rodi_gazebo
 ===========
 [RoDI] (http://rodibot.com/) (Robot Didáctico Inalámbrico) Gazebo model.
 
-Allows to control a RoDI from the Gazebo simulator using the robot's default
-firmware web services API.
+A Gazebo model and plugin for the RoDI educational robot that allows to
+control a simulated version of the robot by using its default firmware
+web services API.
+
+![rodi_gazebo_image](http://i.imgur.com/Y3JF6CB.jpg)
 
 Dependencies
 ------------
 
-The plugin depends on the libmicrohttpd library so it has to be installed.
+The RoDI plugin depends on the [libmicrohttpd](https://www.gnu.org/software/libmicrohttpd/)
+library, so it has to be installed to build and use the plugin.
 
-Install
--------
+Build
+-----
 
-To install the plugin follow these steps:
+The following steps build the Gazebo RoDI plugin:
 
-$ git clone git://github.com/martinezjavier/rodi_gazebo.git
+$ git clone git://github.com/rodibot/rodi_gazebo.git
 
 $ cd rodi_gazebo
 
@@ -40,10 +44,10 @@ To start a simultion with a RoDI model and its plugin:
 
 $ gazebo world/model_rodi.world
 
-The port can be chosen by changing the <port/> tag in
+The TCP port can be changed using the ```<port/>``` tag in
 models/rodi/model.sdf.
 
 Author
 ------
 
-Javier Martinez Canillas <javier@dowhile0.org>
+Javier Martinez Canillas ( javier@dowhile0.org )
