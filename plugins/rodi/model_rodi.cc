@@ -129,12 +129,18 @@ private:
 	event::ConnectionPtr updateConnection;
 	double left, right;
 public:
+	virtual ~RodiWebGazebo();
 	virtual std::string processSee(void);
 	virtual void processMove(int left, int right);
 	void setWheelsVelocity(int left, int right);
 	void setModel(physics::ModelPtr model);
 	void OnUpdate(const common::UpdateInfo &info);
 };
+
+RodiWebGazebo::~RodiWebGazebo()
+{
+	event::Events::DisconnectWorldUpdateBegin(this->updateConnection);
+}
 
 std::string RodiWebGazebo::processSee(void) {
 	std::ostringstream stream;
