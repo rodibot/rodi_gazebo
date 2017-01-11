@@ -193,8 +193,14 @@ private:
 	physics::ModelPtr model;
 	RodiWebGazebo *server;
 public:
+	virtual ~ModelRodi();
 	void Load(physics::ModelPtr parent, sdf::ElementPtr sdf);
 };
+
+ModelRodi::~ModelRodi()
+{
+	delete this->server;
+}
 
 void ModelRodi::Load(physics::ModelPtr parent, sdf::ElementPtr sdf)
 {
