@@ -7,9 +7,14 @@
       <uri>model://ground_plane</uri>
     </include>
 
-    <include>
-      <uri>model://rodi</uri>
-    </include>
+    <model name="rodi0">
+      <include>
+        <uri>model://rodi</uri>
+      </include>
+      <plugin name="model_rodi" filename="libmodel_rodi.so">
+        <port>9999</port>
+      </plugin>
+    </model>
 
     <light name='user_directional_light_0' type='directional'>
       <pose frame=''>0.047698 -0.083421 1 0 -0 0</pose>

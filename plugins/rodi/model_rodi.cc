@@ -173,8 +173,8 @@ void RodiWebGazebo::setModel(physics::ModelPtr model)
 
 	model = model;
 
-	leftWheel = model->GetJoint("left_wheel_servo");
-	rightWheel = model->GetJoint("right_wheel_servo");
+	leftWheel = model->GetJoint("rodi::left_wheel_servo");
+	rightWheel = model->GetJoint("rodi::right_wheel_servo");
 
 #if GAZEBO_MAJOR_VERSION >= 7
 	sonar = std::dynamic_pointer_cast<sensors::SonarSensor>(

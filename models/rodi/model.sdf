@@ -218,9 +218,5 @@
       </axis>
     </joint>
 
-    <plugin name="model_rodi" filename="libmodel_rodi.so">
-      <port>9999</port>
-    </plugin>
-
   </model>
 </sdf>
