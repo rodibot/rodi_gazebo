@@ -170,6 +170,7 @@ void RodiWebGazebo::setWheelsVelocity(int left, int right)
 void RodiWebGazebo::setModel(physics::ModelPtr model)
 {
 	sensors::SensorManager *mgr = sensors::SensorManager::Instance();
+	physics::LinkPtr link = model->GetLink("rodi::base_link");
 
 	model = model;
 
@@ -178,10 +179,10 @@ void RodiWebGazebo::setModel(physics::ModelPtr model)
 
 #if GAZEBO_MAJOR_VERSION >= 7
 	sonar = std::dynamic_pointer_cast<sensors::SonarSensor>(
-		mgr->GetSensor("sonar"));
+		mgr->GetSensor(link->GetSensorName(0)));
 #else
 	sonar = boost::dynamic_pointer_cast<sensors::SonarSensor>(
-		mgr->GetSensor("sonar"));
+		mgr->GetSensor(link->GetSensorName(0)));
 #endif
 	this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 		boost::bind(&RodiWebGazebo::OnUpdate, this, _1));
