@@ -212,6 +212,14 @@ void ModelRodi::Load(physics::ModelPtr parent, sdf::ElementPtr sdf)
 {
 	int port = DEFAULT_PORT;
 
+	if (!parent->GetChild("rodi::base_link") ||
+	    !parent->GetChild("rodi::left_wheel") ||
+	    !parent->GetChild("rodi::right_wheel")) {
+		gzerr << "RoDI links not found in the model, please " <<
+			"make sure that model://rodi is included.\n";
+		return;
+	}
+
 	if (sdf->HasElement("port"))
 		port = sdf->Get<int>("port");
 
