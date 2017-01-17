@@ -197,7 +197,6 @@ void RodiWebGazebo::OnUpdate(const common::UpdateInfo &info)
 class ModelRodi : public ModelPlugin
 {
 private:
-	physics::ModelPtr model;
 	RodiWebGazebo *server;
 public:
 	virtual ~ModelRodi();
@@ -212,13 +211,12 @@ ModelRodi::~ModelRodi()
 void ModelRodi::Load(physics::ModelPtr parent, sdf::ElementPtr sdf)
 {
 	int port = DEFAULT_PORT;
-	this->model = parent;
 
 	if (sdf->HasElement("port"))
 		port = sdf->Get<int>("port");
 
 	server = new RodiWebGazebo(port);
-	server->setModel(this->model);
+	server->setModel(parent);
 }
 
 GZ_REGISTER_MODEL_PLUGIN(ModelRodi)
