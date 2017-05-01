@@ -42,7 +42,7 @@ Usage
 
 To start a simultion with a RoDI model and its plugin:
 
-$ gazebo world/model_rodi.world
+$ gazebo worlds/model_rodi.world
 
 The TCP port can be changed using the ```<port/>``` tag in
 models/rodi/model.sdf.
