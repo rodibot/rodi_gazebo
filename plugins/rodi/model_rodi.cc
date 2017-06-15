@@ -6,22 +6,23 @@
 #include <gazebo/common/common.hh>
 #include <gazebo/sensors/SensorManager.hh>
 #include <gazebo/sensors/SonarSensor.hh>
+#include <gazebo/sensors/CameraSensor.hh>
 #include <iostream>
 #include <string>
 #include <microhttpd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sstream>
 
 #define DEFAULT_PORT 9999
-
 using namespace gazebo;
-
-enum RodiCommand { SEE = 5, MOVE = 3 };
+enum RodiCommand { SEE = 5, MOVE = 3, LIGHT =7, SONG=4, SENSE=2 };
 
 class RodiWeb {
 private:
 	/* Only See (5) and Move (3) commands are supported */
-	std::string urlRegex = "^/(5|3(/-?([0-9][0-9]?|100)){2})/?$";
+	std::string urlRegex = "^/(7|5|2|3(/-?([0-9][0-9]?|100)){2}|4(/([0-9][0-9][0-9]?[0-9]?)/[0-9]+))/?$";
+
 	struct MHD_Daemon* webServer;
 	bool urlMatches(const char *url);
 	static int requestCallback(void *cls, struct MHD_Connection *connection,
@@ -35,6 +36,9 @@ public:
 	~RodiWeb(void);
 	virtual std::string processSee(void) = 0;
 	virtual void processMove(int left, int right) = 0;
+	virtual std::string processLight(void)=0;
+	virtual std::string processSense(void)=0;
+	virtual void processSong(int left, int right)=0;
 };
 
 bool RodiWeb::urlMatches(const char *url)
@@ -91,6 +95,17 @@ int RodiWeb::requestCallback(void *cls, struct MHD_Connection *connection,
 		server->getMoveParams(url, &left, &right);
 		server->processMove(left, right);
 		break;
+	case LIGHT:
+		res=server->processLight();
+		break;
+	case SONG:
+		server->getMoveParams(url,&left,&right);
+		server->processSong(left,right);
+		break;
+	case SENSE:
+		res=server->processSense();
+		break;
+
 	}
 
 	response = MHD_create_response_from_buffer(strlen(res.c_str()),
@@ -126,12 +141,17 @@ private:
 	physics::JointPtr leftWheel;
 	physics::JointPtr rightWheel;
 	sensors::SonarSensorPtr sonar;
+	sensors::CameraSensorPtr lightSensor;
+	sensors::CameraSensorPtr irSensor;
 	event::ConnectionPtr updateConnection;
 	double left, right;
 public:
 	virtual ~RodiWebGazebo();
 	virtual std::string processSee(void);
+	virtual std::string processLight(void);
+	virtual std::string processSense(void);
 	virtual void processMove(int left, int right);
+	virtual void processSong(int left, int right);
 	void setWheelsVelocity(int left, int right);
 	void setModel(physics::ModelPtr model);
 	void OnUpdate(const common::UpdateInfo &info);
@@ -151,6 +171,46 @@ std::string RodiWebGazebo::processSee(void) {
 	stream << (int)(sonar->GetRange() * 100);
 #endif
 	return stream.str();
+}
+
+std::string RodiWebGazebo::processLight(void)
+{
+	std::ostringstream stream;
+	lightSensor->SaveFrame("lightsensor.png");
+	common::Image imagen("lightsensor.png");
+	common::Color colorImagen = imagen.GetAvgColor();
+	//Para calcular la luminancia L =0.2126*R + 0.7152*G  +0.0722*B
+	float luminancia = 0.2126*colorImagen.r + 0.7152*colorImagen.g + 0.0722*colorImagen.b;
+	stream << static_cast<int>(luminancia*1023.0);
+	return stream.str();
+
+}
+
+std::string RodiWebGazebo::processSense(void)
+{
+	std::ostringstream stream;
+	irSensor->SaveFrame("irsensor.png");
+	common::Image imagen("irsensor.png");
+	common::Color colorImagen = imagen.GetAvgColor();
+	//Para calcular la luminancia L =0.2126*R + 0.7152*G  +0.0722*B
+	float luminancia = 0.2126*colorImagen.r + 0.7152*colorImagen.g + 0.0722*colorImagen.b;
+	stream << static_cast<int>(luminancia*1023.0);
+	return stream.str();
+
+}
+
+void RodiWebGazebo::processSong(int left, int right)
+{
+	int note = left;
+	float duration = static_cast< float >(right) / 1000.0;
+
+	std::cout << duration;
+	std::ostringstream command;
+	command << "( speaker-test -t sine -f " << note << " )& pid=$! ; sleep "<< duration <<"s ; kill -9 $pid";
+	std::string commandString = command.str();
+	system(commandString.c_str());
+	
+
 }
 
 void RodiWebGazebo::processMove(int left, int right)
@@ -180,9 +240,17 @@ void RodiWebGazebo::setModel(physics::ModelPtr model)
 #if GAZEBO_MAJOR_VERSION >= 7
 	sonar = std::dynamic_pointer_cast<sensors::SonarSensor>(
 		mgr->GetSensor(link->GetSensorName(0)));
+	lightSensor = std::dynamic_pointer_cast<sensors::CameraSensor>(
+		mgr->GetSensor(link->GetSensorName(1)));
+	irSensor = std::dynamic_pointer_cast<sensors::CameraSensor>(
+		mgr->GetSensor(link->GetSensorName(2)));
 #else
 	sonar = boost::dynamic_pointer_cast<sensors::SonarSensor>(
 		mgr->GetSensor(link->GetSensorName(0)));
+	lightSensor = boost::dynamic_pointer_cast<sensors::CameraSensor>(
+		mgr->GetSensor(link->GetSensorName(1)));
+	irSensor = boost::dynamic_pointer_cast<sensors::CameraSensor>(
+		mgr->GetSensor(link->GetSensorName(2)));
 #endif
 	this->updateConnection = event::Events::ConnectWorldUpdateBegin(
 		boost::bind(&RodiWebGazebo::OnUpdate, this, _1));
