@@ -100,8 +100,8 @@ int RodiWeb::requestCallback(void *cls, struct MHD_Connection *connection,
 		break;
 	case SONG:
 		std::cout << "This method is not available yet\n";
-		//server->getMoveParams(url,&left,&right);
-		//server->processSong(left,right);
+		//server->getMoveParams(url, &left, &right);
+		//server->processSong(left, right);
 		break;
 	case SENSE:
 		res = server->processSense();
